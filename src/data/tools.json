@@ -1,0 +1,40 @@
+{
+  "tools": [
+    {
+      "id": "1",
+      "name": "WriteMaster AI",
+      "category": "Text",
+      "price": "Freemium",
+      "rating": 4.6,
+      "description": "Fast AI writer for blogs, ads and seo. Great templates for marketers.",
+      "link": "https://example.com"
+    },
+    {
+      "id": "2",
+      "name": "ImageForge",
+      "category": "Image",
+      "price": "$9/mo",
+      "rating": 4.4,
+      "description": "Create stunning images from text prompts using high-quality models.",
+      "link": "https://example.com"
+    },
+    {
+      "id": "3",
+      "name": "SynthVoice",
+      "category": "Audio",
+      "price": "$29/mo",
+      "rating": 4.2,
+      "description": "Realistic voice synthesis and dubbing for videos and podcasts.",
+      "link": "https://example.com"
+    },
+    {
+      "id": "4",
+      "name": "ClipEdit AI",
+      "category": "Video",
+      "price": "Free trial",
+      "rating": 4.0,
+      "description": "AI assisted video editing: cuts, captions and style transfer.",
+      "link": "https://example.com"
+    }
+  ]
+}
