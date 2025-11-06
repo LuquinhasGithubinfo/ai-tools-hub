@@ -6,6 +6,7 @@ export default function Home() {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('All');
   const [favorites, setFavorites] = useState([]);
+  const [ratingFilter, setRatingFilter] = useState(0);
   const [compareList, setCompareList] = useState([]);
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function Home() {
     } else if (compareList.length < 3) {
       updated = [...compareList, tool];
     } else {
-      return; // máximo 3 para comparar
+      return; // máximo 3
     }
     setCompareList(updated);
   };
@@ -43,7 +44,8 @@ export default function Home() {
       .toLowerCase()
       .includes(query.toLowerCase());
     const matchesCategory = category === 'All' || t.category === category;
-    return matchesQuery && matchesCategory;
+    const matchesRating = t.rating >= ratingFilter;
+    return matchesQuery && matchesCategory && matchesRating;
   });
 
   const similarTools = (tool) =>
@@ -51,8 +53,19 @@ export default function Home() {
 
   const topRated = [...toolsData].sort((a, b) => b.rating - a.rating).slice(0, 3);
 
+  const popularTools = toolsData.filter(t => t.rating >= 4.5).slice(0, 3);
+  const newTools = toolsData.slice(-3);
+
+  const recommendations = favorites.length
+    ? toolsData.filter(t => favorites.includes(t.name) === false && favorites.some(fav => {
+        const favTool = toolsData.find(tool => tool.name === fav);
+        return favTool && favTool.category === t.category;
+      }))
+    : [];
+
   return (
     <section>
+      {/* Pesquisa e filtros */}
       <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
         <div>
           <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Discover top AI tools</h2>
@@ -64,6 +77,15 @@ export default function Home() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search tools..."
             className="border rounded-lg px-3 py-2 w-64 dark:bg-gray-700 dark:text-gray-100"
+          />
+          <input
+            type="number"
+            min="0"
+            max="5"
+            value={ratingFilter}
+            onChange={(e) => setRatingFilter(Number(e.target.value))}
+            placeholder="Min rating"
+            className="border rounded-lg px-3 py-2 w-32 dark:bg-gray-700 dark:text-gray-100"
           />
           <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
             {categories.map(c => (
@@ -83,23 +105,44 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Top Tools */}
       <div className="mb-4">
         <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">Top Tools This Month</h3>
         <div className="flex gap-4 mt-2">
           {topRated.map((tool, idx) => (
-            <div key={tool.name} className="flex-1">
-              <ToolCard
-                tool={tool}
-                onFavorite={toggleFavorite}
-                isFavorite={favorites.includes(tool.name)}
-                similarTools={similarTools(tool)}
-                rank={idx + 1}
-              />
-            </div>
+            <ToolCard
+              key={tool.name}
+              tool={tool}
+              onFavorite={toggleFavorite}
+              isFavorite={favorites.includes(tool.name)}
+              similarTools={similarTools(tool)}
+              rank={idx + 1}
+              popular={popularTools.includes(tool)}
+              newTool={newTools.includes(tool)}
+            />
           ))}
         </div>
       </div>
 
+      {/* Recomendações */}
+      {recommendations.length > 0 && (
+        <div className="mb-6">
+          <h4 className="text-lg font-semibold text-gray-700 dark:text-gray-300">You might like</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+            {recommendations.map(tool => (
+              <ToolCard
+                key={tool.name}
+                tool={tool}
+                onFavorite={toggleFavorite}
+                isFavorite={favorites.includes(tool.name)}
+                similarTools={similarTools(tool)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Ferramentas filtradas */}
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((tool, index) => (
@@ -116,6 +159,7 @@ export default function Home() {
         <p className="text-gray-500 dark:text-gray-400 mt-4">No tools found 😕</p>
       )}
 
+      {/* Comparação */}
       {compareList.length > 1 && (
         <div className="mt-6 p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900">
           <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">Compare Tools</h4>
