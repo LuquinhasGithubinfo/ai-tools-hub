@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ToolCard from '../components/ToolCard';
+import Feedback from '../components/Feedback';
 import toolsData from '../data/tools.json';
 
 export default function Home() {
@@ -32,7 +33,7 @@ export default function Home() {
     } else if (compareList.length < 3) {
       updated = [...compareList, tool];
     } else {
-      return; // máximo 3
+      return; // máximo 3 ferramentas
     }
     setCompareList(updated);
   };
@@ -119,6 +120,7 @@ export default function Home() {
               rank={idx + 1}
               popular={popularTools.includes(tool)}
               newTool={newTools.includes(tool)}
+              onCompare={toggleCompare}
             />
           ))}
         </div>
@@ -136,6 +138,7 @@ export default function Home() {
                 onFavorite={toggleFavorite}
                 isFavorite={favorites.includes(tool.name)}
                 similarTools={similarTools(tool)}
+                onCompare={toggleCompare}
               />
             ))}
           </div>
@@ -152,6 +155,7 @@ export default function Home() {
               onFavorite={toggleFavorite}
               isFavorite={favorites.includes(tool.name)}
               similarTools={similarTools(tool)}
+              onCompare={toggleCompare}
             />
           ))}
         </div>
@@ -174,6 +178,9 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Seção de Feedback do site */}
+      <Feedback />
     </section>
   );
 }
