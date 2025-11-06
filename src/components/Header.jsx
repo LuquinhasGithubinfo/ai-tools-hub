@@ -12,12 +12,12 @@ export default function Header() {
           </div>
         </div>
         <nav className="flex flex-wrap gap-4 items-center">
-          <a href="#" className="text-sm hover:underline text-gray-700 dark:text-gray-300">Home</a>
-          <a href="#" className="text-sm hover:underline text-gray-700 dark:text-gray-300">Categories</a>
-          <a href="#" className="text-sm hover:underline text-gray-700 dark:text-gray-300">Blog</a>
-          <button className="ml-2 px-3 py-1 rounded-lg border border-gray-200 dark:border-gray-700 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-            Subscribe
-          </button>
+          {/* Link funcional */}
+          <a href="/" className="text-sm hover:underline text-gray-700 dark:text-gray-300">Home</a>
+
+          {/* Links placeholders */}
+          <span className="text-sm text-gray-500 cursor-not-allowed" title="Página em construção">Categories</span>
+          <span className="text-sm text-gray-500 cursor-not-allowed" title="Página em construção">Blog</span>
         </nav>
       </div>
     </header>
