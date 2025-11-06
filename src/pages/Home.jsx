@@ -6,6 +6,7 @@ export default function Home() {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('All');
   const [favorites, setFavorites] = useState([]);
+  const [compareList, setCompareList] = useState([]);
 
   useEffect(() => {
     const saved = localStorage.getItem('favorites');
@@ -23,6 +24,18 @@ export default function Home() {
     localStorage.setItem('favorites', JSON.stringify(updated));
   };
 
+  const toggleCompare = (tool) => {
+    let updated;
+    if (compareList.some(t => t.name === tool.name)) {
+      updated = compareList.filter(t => t.name !== tool.name);
+    } else if (compareList.length < 3) {
+      updated = [...compareList, tool];
+    } else {
+      return; // máximo 3 para comparar
+    }
+    setCompareList(updated);
+  };
+
   const categories = ['All', ...new Set(toolsData.map(t => t.category))];
 
   const filtered = toolsData.filter(t => {
@@ -36,11 +49,7 @@ export default function Home() {
   const similarTools = (tool) =>
     toolsData.filter(t => t.category === tool.category && t.name !== tool.name).slice(0, 3);
 
-  const stats = {
-    total: toolsData.length,
-    categories: categories.length - 1,
-    topRated: toolsData.reduce((prev, curr) => curr.rating > prev.rating ? curr : prev, toolsData[0])
-  };
+  const topRated = [...toolsData].sort((a, b) => b.rating - a.rating).slice(0, 3);
 
   return (
     <section>
@@ -48,9 +57,6 @@ export default function Home() {
         <div>
           <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Discover top AI tools</h2>
           <p className="text-gray-600 dark:text-gray-300 mt-1">Compare, read short reviews and follow links</p>
-          <div className="mt-2 text-xs text-gray-500">
-            {stats.total} tools, {stats.categories} categories, top rated: {stats.topRated.name} ({stats.topRated.rating})
-          </div>
         </div>
         <div className="flex flex-col md:flex-row gap-2 flex-wrap">
           <input
@@ -77,6 +83,23 @@ export default function Home() {
         </div>
       </div>
 
+      <div className="mb-4">
+        <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">Top Tools This Month</h3>
+        <div className="flex gap-4 mt-2">
+          {topRated.map((tool, idx) => (
+            <div key={tool.name} className="flex-1">
+              <ToolCard
+                tool={tool}
+                onFavorite={toggleFavorite}
+                isFavorite={favorites.includes(tool.name)}
+                similarTools={similarTools(tool)}
+                rank={idx + 1}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((tool, index) => (
@@ -91,6 +114,21 @@ export default function Home() {
         </div>
       ) : (
         <p className="text-gray-500 dark:text-gray-400 mt-4">No tools found 😕</p>
+      )}
+
+      {compareList.length > 1 && (
+        <div className="mt-6 p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900">
+          <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">Compare Tools</h4>
+          <div className="grid grid-cols-compare gap-4">
+            {compareList.map(tool => (
+              <div key={tool.name} className="p-2 bg-white dark:bg-gray-800 rounded shadow">
+                <h5 className="font-semibold">{tool.name}</h5>
+                <p className="text-xs">{tool.category} • {tool.price}</p>
+                <p className="text-xs">Rating: {tool.rating}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </section>
   );

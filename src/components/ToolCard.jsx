@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export default function ToolCard({ tool, onFavorite, isFavorite, similarTools }) {
+export default function ToolCard({ tool, onFavorite, isFavorite, similarTools, rank }) {
+  const [showDetails, setShowDetails] = useState(false);
   const domain = new URL(tool.url).hostname;
   const logoUrl = `https://logo.clearbit.com/${domain}?size=80`;
 
   return (
-    <article className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col transition-transform hover:scale-105 hover:shadow-xl">
+    <article className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col transition-transform hover:scale-105 hover:shadow-xl relative">
+      {rank && (
+        <div className="absolute top-2 left-2 bg-yellow-400 text-black px-2 py-1 text-xs rounded font-bold">
+          #{rank}
+        </div>
+      )}
       <div className="flex items-center gap-4">
         <img
           src={logoUrl}
@@ -37,16 +43,16 @@ export default function ToolCard({ tool, onFavorite, isFavorite, similarTools })
         <div className="text-xs text-gray-500">Rating: {tool.rating} / 5</div>
       </div>
 
-      {similarTools && similarTools.length > 0 && (
-        <div className="mt-4">
-          <p className="text-xs text-gray-500 mb-1">Similar tools:</p>
-          <div className="flex gap-2 flex-wrap">
-            {similarTools.map(s => (
-              <span key={s.name} className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 rounded">
-                {s.name}
-              </span>
-            ))}
-          </div>
+      <button
+        onClick={() => setShowDetails(!showDetails)}
+        className="mt-2 text-xs text-gray-500 hover:underline"
+      >
+        {showDetails ? 'Hide details' : 'Show details'}
+      </button>
+
+      {showDetails && similarTools && similarTools.length > 0 && (
+        <div className="mt-2 text-xs text-gray-500">
+          Similar tools: {similarTools.map(s => s.name).join(', ')}
         </div>
       )}
     </article>
