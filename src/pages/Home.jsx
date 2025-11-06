@@ -1,13 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import toolsData from '../data/tools.json';
 
 function ToolCard({ tool }) {
+  // Extrai o domínio do URL da ferramenta
+  const domain = new URL(tool.url).hostname;
+
+  // Link do logo via Clearbit + fallback
+  const logoUrl = `https://logo.clearbit.com/${domain}?size=80`;
+
   return (
     <article className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col transition-transform hover:scale-105 hover:shadow-xl">
       <div className="flex items-center gap-4">
         <img
-          src={tool.logo || '/src/assets/placeholder.svg'}
+          src={logoUrl}
           alt={tool.name}
           className="w-12 h-12 rounded-md object-cover"
+          onError={(e) => { e.target.src = 'https://via.placeholder.com/80'; }}
         />
         <div>
           <h3 className="font-semibold text-gray-800 dark:text-gray-100">{tool.name}</h3>
@@ -32,19 +40,11 @@ function ToolCard({ tool }) {
 
 export default function Home() {
   const [query, setQuery] = useState('');
-  const [tools, setTools] = useState([]);
   const [category, setCategory] = useState('All');
 
-  useEffect(() => {
-    fetch('/tools.json')
-      .then(res => res.json())
-      .then(data => setTools(data))
-      .catch(err => console.error('Erro ao carregar tools.json:', err));
-  }, []);
+  const categories = ['All', ...new Set(toolsData.map(t => t.category))];
 
-  const categories = ['All', ...new Set(tools.map(t => t.category))];
-
-  const filtered = tools.filter(t => {
+  const filtered = toolsData.filter(t => {
     const matchesQuery = (t.name + ' ' + t.description + ' ' + t.category)
       .toLowerCase()
       .includes(query.toLowerCase());
