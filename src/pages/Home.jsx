@@ -1,18 +1,40 @@
 import React, { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import ToolCard from '../components/ToolCard';
 import Feedback from '../components/Feedback';
-import toolsData from '../data/tools.json';
+
+// Supabase config
+const supabaseUrl = 'https://walmydjpijdeupezmhay.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhbG15ZGpwaWpkZXVwZXptaGF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzODE5OTAsImV4cCI6MjA3Nzk1Nzk5MH0.BrMv88qTehKy1YrPI_pgG1bDvOEhbIkCORn1oVdKQ64';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function Home() {
+  const [toolsData, setToolsData] = useState([]);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('All');
   const [favorites, setFavorites] = useState([]);
   const [ratingFilter, setRatingFilter] = useState(0);
   const [compareList, setCompareList] = useState([]);
 
+  // Carregar favoritos do localStorage
   useEffect(() => {
     const saved = localStorage.getItem('favorites');
     if (saved) setFavorites(JSON.parse(saved));
+  }, []);
+
+  // Buscar dados do Supabase
+  useEffect(() => {
+    const fetchTools = async () => {
+      const { data, error } = await supabase
+        .from('tools')
+        .select('*'); // pega todas as colunas
+      if (error) {
+        console.error('Erro ao buscar ferramentas:', error);
+      } else {
+        setToolsData(data);
+      }
+    };
+    fetchTools();
   }, []);
 
   const toggleFavorite = (name) => {
@@ -58,7 +80,7 @@ export default function Home() {
   const newTools = toolsData.slice(-3);
 
   const recommendations = favorites.length
-    ? toolsData.filter(t => favorites.includes(t.name) === false && favorites.some(fav => {
+    ? toolsData.filter(t => !favorites.includes(t.name) && favorites.some(fav => {
         const favTool = toolsData.find(tool => tool.name === fav);
         return favTool && favTool.category === t.category;
       }))
@@ -179,7 +201,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Seção de Feedback do site */}
+      {/* Feedback */}
       <Feedback />
     </section>
   );
